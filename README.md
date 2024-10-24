@@ -2,6 +2,10 @@
 
 Please 🥺 read this guide before starting development.
 
+## Frontend Repository
+
+<https://github.com/denis-vp/pawpal-frontend>
+
 ## Table of Contents
 
 - [Development Guide](#development-guide)
