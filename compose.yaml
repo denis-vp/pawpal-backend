@@ -2,8 +2,8 @@ services:
   postgres:
     image: 'postgres:latest'
     environment:
-      - 'POSTGRES_DB=pawpal'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_USER: 'myuser'
+      POSTGRES_PASSWORD: 'secret'
+      POSTGRES_DB: 'pawpal'
     ports:
-      - '5432'
+      - '5435:5432'

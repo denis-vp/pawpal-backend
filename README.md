@@ -17,7 +17,7 @@ Please 🥺 read this guide before starting development.
 
 ## Prerequisites
 
-The project requires the following tools to be installed on your system: Git, IntelliJ IDEA.
+The project requires the following tools to be installed on your system: Git, IntelliJ IDEA, Docker.
 
 ## Getting Started
 
