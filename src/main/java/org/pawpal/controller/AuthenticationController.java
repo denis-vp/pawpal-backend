@@ -30,12 +30,18 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginDTO loginDTO) {
-        User user = authenticationService.login(loginDTO);
-        String jwtToken = jwtService.generateToken(user);
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(jwtToken);
-        loginResponse.setExpiresIn(jwtService.getExpirationTime());
-        return ResponseEntity.ok(loginResponse);
+    public ResponseEntity<Object> login(@RequestBody LoginDTO loginDTO) {
+        try {
+            User user = authenticationService.login(loginDTO);
+            String jwtToken = jwtService.generateToken(user);
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setToken(jwtToken);
+            loginResponse.setExpiresIn(jwtService.getExpirationTime());
+            loginResponse.setAudience(jwtService.extractAudience(jwtToken));
+            return ResponseEntity.ok(loginResponse);
+        }
+        catch (Exception e) {
+            return ResponseEntity.ok(e.getMessage());
+        }
     }
 }

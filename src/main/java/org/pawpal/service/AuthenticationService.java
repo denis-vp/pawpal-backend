@@ -5,9 +5,14 @@ import org.pawpal.dto.RegisterDTO;
 import org.pawpal.model.User;
 import org.pawpal.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -31,9 +36,14 @@ public class AuthenticationService {
     }
 
     public User login(LoginDTO loginDTO) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword())
-        );
-        return userRepository.findByEmail(loginDTO.getEmail()).orElseThrow();
+        Optional<User> user = userRepository.findByEmail(loginDTO.getEmail());
+        if (user.isPresent()) {
+            if (passwordEncoder.matches(loginDTO.getPassword(), user.get().getPassword())) {
+                return user.get();
+            }
+            else
+                throw new BadCredentialsException("Wrong password");
+        }
+        else throw new UsernameNotFoundException("User not found");
     }
 }

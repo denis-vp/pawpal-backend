@@ -2,8 +2,10 @@ package org.pawpal.model;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +89,12 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        List<String> names = roles.stream().map(Role::getName).toList();
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (String name : names) {
+            authorities.add(new SimpleGrantedAuthority(name));
+        }
+        return authorities;
     }
 
     public String getPassword() {
