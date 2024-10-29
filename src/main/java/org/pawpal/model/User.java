@@ -29,9 +29,6 @@ public class User implements UserDetails {
     @Column(name = "password")
     String password;
 
-    @Column(name = "passwordAttempts")
-    int passwordAttempts;
-
     @Column(name = "isNew")
     boolean isNew;
 
@@ -45,12 +42,11 @@ public class User implements UserDetails {
 
     public User() {}
 
-    public User(String firstName, String lastName, String email, String password, int passwordAttempts, boolean isNew, Set<Role> roles) {
+    public User(String firstName, String lastName, String email, String password, boolean isNew, Set<Role> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.passwordAttempts = passwordAttempts;
         this.isNew = isNew;
         this.roles = roles;
     }
@@ -128,14 +124,6 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public int getPasswordAttempts() {
-        return passwordAttempts;
-    }
-
-    public void setPasswordAttempts(int passwordAttempts) {
-        this.passwordAttempts = passwordAttempts;
     }
 
     public boolean isNew() {

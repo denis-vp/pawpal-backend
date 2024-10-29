@@ -3,14 +3,14 @@ package org.pawpal.dto;
 public class LoginResponse {
     private String token;
     private long expiresIn;
-    private String audience;
+    private boolean newUser;
 
-    public String getAudience() {
-        return audience;
+    public boolean isNewUser() {
+        return newUser;
     }
 
-    public void setAudience(String audience) {
-        this.audience = audience;
+    public void setNewUser(boolean newUser) {
+        this.newUser = newUser;
     }
 
     public String getToken() {
