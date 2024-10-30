@@ -85,12 +85,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<String> names = roles.stream().map(Role::getName).toList();
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String name : names) {
-            authorities.add(new SimpleGrantedAuthority(name));
-        }
-        return authorities;
+        return List.of();
     }
 
     public String getPassword() {
