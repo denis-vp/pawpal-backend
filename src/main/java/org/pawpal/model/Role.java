@@ -7,13 +7,13 @@ import jakarta.persistence.*;
 public class Role {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
 
     @Column(name = "name")
     String name;
 
-    public Role(Long id, String name) {
-        this.id = id;
+    public Role(String name) {
         this.name = name;
     }
 
