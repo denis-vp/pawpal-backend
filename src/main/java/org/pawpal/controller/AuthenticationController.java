@@ -30,14 +30,25 @@ public class AuthenticationController {
         this.userRepository = userRepository;
     }
 
+    /*
+        Creates an account for a user.
+        @param the first name, last name and email of the user
+        @return a message showing if the registration was successful
+     */
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody RegisterDTO registerDTO) {
         if(userRepository.findByEmail(registerDTO.getEmail()).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An account with this email already exists");
         User user = authenticationService.register(registerDTO);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok("Your account was created! Check your email");
     }
 
+    /*
+        Signs in an existent user
+        @param the email and the password
+        @return a jwt token, the expiration time and a flag showing if the user is new or not
+        @throws BadCredentialsException if the login was not successful
+     */
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginDTO loginDTO) {
         try {
