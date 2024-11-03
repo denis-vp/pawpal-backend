@@ -31,6 +31,10 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }

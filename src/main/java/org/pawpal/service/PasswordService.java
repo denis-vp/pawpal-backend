@@ -38,4 +38,19 @@ public class PasswordService {
 
         return shufflePassword(password.toString());
     }
+
+    public static boolean isValid(String password) {
+        boolean containsUpperCase = false;
+        boolean containsLowerCase = false;
+        boolean containsDigit = false;
+        boolean containsSpecial = false;
+        for (int i = 0; i < password.length(); i++) {
+            char ch = password.charAt(i);
+            if(UPPERCASE.indexOf(ch) != -1) containsUpperCase = true;
+            if(LOWERCASE.indexOf(ch) != -1) containsLowerCase = true;
+            if(DIGITS.indexOf(ch) != -1) containsDigit = true;
+            if(SPECIAL_CHARACTERS.indexOf(ch) != -1) containsSpecial = true;
+        }
+        return containsUpperCase && containsLowerCase && containsDigit && containsSpecial;
+    }
 }

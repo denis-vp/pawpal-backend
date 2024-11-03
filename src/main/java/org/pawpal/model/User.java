@@ -89,7 +89,6 @@ public class User implements UserDetails {
         Collection<? extends GrantedAuthority> authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
-        System.out.println(authorities);
         return authorities;
     }
 
