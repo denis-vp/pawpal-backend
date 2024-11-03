@@ -41,9 +41,9 @@ public class AuthenticationService {
         System.out.println("Generated password: " + password);
         user.setPassword(passwordEncoder.encode(password));
         user.setNew(true);
-        Role userRole = roleRepository.findByName("USER");
+        Role userRole = roleRepository.findByName("ROLE_USER");
         if(userRole == null) {
-            userRole = new Role("USER");
+            userRole = new Role("ROLE_USER");
             roleRepository.save(userRole);
         }
         user.setRoles(Set.of(userRole));
