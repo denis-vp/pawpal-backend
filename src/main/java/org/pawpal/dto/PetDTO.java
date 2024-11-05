@@ -5,14 +5,17 @@ public class PetDTO {
     private String name;
     private String breed;
     private int age;
+    private int weight;
+    private String medicalHistory;
     private String email;
 
-    public PetDTO(Long id, String name, String breed, int age, String ownerId) {
+
+    public PetDTO(Long id, String name, String breed, int age, int weight, String medicalHistory, String email) {
         this.id = id;
         this.name = name;
         this.breed = breed;
         this.age = age;
-        this.email = ownerId;
+        this.email = email;
     }
 
     public Long getId() {
@@ -49,6 +52,22 @@ public class PetDTO {
 
     public String getEmail() {
         return email;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public String getMedicalHistory() {
+        return medicalHistory;
+    }
+
+    public void setMedicalHistory(String medicalHistory) {
+        this.medicalHistory = medicalHistory;
     }
 
     public void setEmail(String email) {

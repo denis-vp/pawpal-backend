@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PetService {
@@ -26,27 +27,42 @@ public class PetService {
                 .toList();
     }
 
+    public List<PetDTO> getPetsByUserId(Long userId) {
+        return petRepository.findAll().stream()
+                .filter(p -> Objects.equals(p.getOwner().getId(), userId))
+                .map(MapperUtil::toPetDTO)
+                .toList();
+    }
+
     public PetDTO getPetById(Long id) {
-        return MapperUtil.toPetDTO(petRepository.getOne(id));
+        if (petRepository.existsById(id)) {
+            return MapperUtil.toPetDTO(petRepository.getOne(id));
+        } else throw new RuntimeException("Pet not found");
     }
 
     public PetDTO createPet(PetDTO petDTO) {
-        User user=userRepository.findByEmail(petDTO.getEmail());
-        Pet pet=MapperUtil.toPet(petDTO,user);
+        User user = userRepository.findByEmail(petDTO.getEmail());
+        Pet pet = MapperUtil.toPet(petDTO, user);
         return MapperUtil.toPetDTO(petRepository.save(pet));
     }
 
-    public PetDTO updatePet(Long id,PetDTO petDTO) {
-        if(petRepository.existsById(id)) {
-            User user=userRepository.findByEmail(petDTO.getEmail());
-            Pet pet=MapperUtil.toPet(petDTO,user);
-            //pet.setId(id);//?
-            return MapperUtil.toPetDTO(petRepository.save(pet));
-        }
-        else throw new RuntimeException("Pet not found");
+    public PetDTO updatePet(Long id, PetDTO petDTO) {
+        if (petRepository.existsById(id)) {
+            Pet existingPet = petRepository.getOne(id);
+            existingPet.setName(petDTO.getName());
+            existingPet.setAge(petDTO.getAge());
+            existingPet.setBreed(petDTO.getBreed());
+            existingPet.setWeight(petDTO.getWeight());
+            existingPet.setMedicalHistory(petDTO.getMedicalHistory());
+            Pet updatedPet = petRepository.save(existingPet);
+            return MapperUtil.toPetDTO(updatedPet);
+        } else throw new RuntimeException("Pet not found");
     }
+
     public void deletePet(Long id) {
-        petRepository.deleteById(id);
+        if (petRepository.existsById(id)) {
+            petRepository.deleteById(id);
+        } else throw new RuntimeException("Pet not found");
     }
 
 }
