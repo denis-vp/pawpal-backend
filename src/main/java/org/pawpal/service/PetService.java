@@ -9,6 +9,8 @@ import org.pawpal.util.MapperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,9 +29,9 @@ public class PetService {
                 .toList();
     }
 
-    public List<PetDTO> getPetsByUserId(Long userId) {
+    public List<PetDTO> getPetsByUserEmail(String email) {
         return petRepository.findAll().stream()
-                .filter(p -> Objects.equals(p.getOwner().getId(), userId))
+                .filter(p -> Objects.equals(p.getOwner().getEmail(), email))
                 .map(MapperUtil::toPetDTO)
                 .toList();
     }
@@ -59,7 +61,7 @@ public class PetService {
         } else throw new RuntimeException("Pet not found");
     }
 
-    public void deletePet(Long id) {
+    public void deletePet(Long id)  {
         if (petRepository.existsById(id)) {
             petRepository.deleteById(id);
         } else throw new RuntimeException("Pet not found");

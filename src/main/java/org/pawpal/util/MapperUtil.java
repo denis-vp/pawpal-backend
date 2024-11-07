@@ -5,6 +5,7 @@ import org.pawpal.dto.UserDTO;
 import org.pawpal.model.Pet;
 import org.pawpal.model.User;
 
+import java.util.Base64;
 import java.util.List;
 
 public class MapperUtil {
@@ -16,7 +17,11 @@ public class MapperUtil {
     }
 
     public static PetDTO toPetDTO(Pet pet) {
-        return new PetDTO(pet.getId(), pet.getName(), pet.getBreed(), pet.getAge(), pet.getWeight(), pet.getMedicalHistory(), pet.getOwner().getEmail());
+        String base64Image = "";
+        if (pet.getImageData() != null) {
+            base64Image = Base64.getEncoder().encodeToString(pet.getImageData());
+        }
+        return new PetDTO(pet.getId(), pet.getName(), pet.getBreed(), pet.getAge(), pet.getWeight(), pet.getMedicalHistory(), pet.getOwner().getEmail(), base64Image);
     }
 
     public static Pet toPet(PetDTO petDTO, User user) {
@@ -28,6 +33,10 @@ public class MapperUtil {
         pet.setWeight(petDTO.getWeight());
         pet.setMedicalHistory(petDTO.getMedicalHistory());
         pet.setOwner(user);
+        if (petDTO.getImage() != null && !petDTO.getImage().isEmpty()) {
+            byte[] imageData = Base64.getDecoder().decode(petDTO.getImage());
+            pet.setImageData(imageData);
+        }
         return pet;
     }
 

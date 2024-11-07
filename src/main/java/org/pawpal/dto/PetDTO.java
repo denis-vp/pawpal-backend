@@ -8,14 +8,24 @@ public class PetDTO {
     private int weight;
     private String medicalHistory;
     private String email;
+    private String image;
 
 
-    public PetDTO(Long id, String name, String breed, int age, int weight, String medicalHistory, String email) {
+    public PetDTO(Long id, String name, String breed, int age, int weight, String medicalHistory, String email, String image) {
         this.id = id;
         this.name = name;
         this.breed = breed;
         this.age = age;
         this.email = email;
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public Long getId() {

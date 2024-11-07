@@ -3,7 +3,7 @@ package org.pawpal.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="pets")
+@Table(name = "pets")
 public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,14 +24,28 @@ public class Pet {
     @Column
     String medicalHistory;
 
-    public Pet() {}
+    @Lob
+    @Column(name = "image_data")
+    private byte[] imageData;
 
-    public Pet(String name, String breed, int age, int weight, String medicalHistory) {
+    public Pet() {
+    }
+
+    public Pet(String name, String breed, int age, int weight, String medicalHistory, byte[] imageData) {
         this.name = name;
         this.breed = breed;
         this.age = age;
         this.weight = weight;
         this.medicalHistory = medicalHistory;
+        this.imageData = imageData;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
     }
 
     @ManyToOne

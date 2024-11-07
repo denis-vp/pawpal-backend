@@ -3,10 +3,12 @@ package org.pawpal.controller;
 import org.pawpal.dto.PetDTO;
 import org.pawpal.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -17,12 +19,12 @@ public class PetController {
     private PetService petService;
 
     /**
-     * @param id the ID of the user
+     * @param email the Email of the user
      * @return the user's List of PetDTO if id is found,
      **/
-    @GetMapping("/all/{id}")
-    public List<PetDTO> getPetsByUserId(@PathVariable Long id) {
-        return petService.getPetsByUserId(id);
+    @GetMapping("/all/{email}")
+    public List<PetDTO> getPetsByUserEmail(@PathVariable String email) {
+        return petService.getPetsByUserEmail(email);
     }
 
     /**
@@ -54,8 +56,8 @@ public class PetController {
      * @return the PetDTO that was added,
      **/
     @PostMapping("/add")
-    public PetDTO createPet(@RequestBody PetDTO petDTO) {
-        return petService.createPet(petDTO);
+    public String createPet(@RequestBody PetDTO petDTO) {
+        return petService.createPet(petDTO).getId().toString();
     }
 
     /**
@@ -65,12 +67,12 @@ public class PetController {
      * @throws RuntimeException if the pet with the specified ID is not found in the system
      **/
     @PostMapping("/{id}")
-    public ResponseEntity<PetDTO> updatePet(@PathVariable Long id, @RequestBody PetDTO petDTO) {
+    public ResponseEntity<String> updatePet(@PathVariable Long id, @RequestBody PetDTO petDTO) {
         try {
             PetDTO persistedPet = petService.updatePet(id, petDTO);
-            return ResponseEntity.ok(persistedPet);
+            return ResponseEntity.ok(persistedPet.getId().toString());
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).eTag("Path not found").body(null);
         }
     }
 
@@ -84,8 +86,7 @@ public class PetController {
             petService.deletePet(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).eTag("Pet not found").build();
         }
     }
-
 }
