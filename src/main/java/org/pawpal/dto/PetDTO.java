@@ -18,6 +18,8 @@ public class PetDTO {
         this.age = age;
         this.email = email;
         this.image = image;
+        this.weight = weight;
+        this.medicalHistory = medicalHistory;
     }
 
     public String getImage() {

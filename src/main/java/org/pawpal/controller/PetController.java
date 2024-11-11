@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
@@ -57,7 +58,12 @@ public class PetController {
      **/
     @PostMapping("/add")
     public String createPet(@RequestBody PetDTO petDTO) {
-        return petService.createPet(petDTO).getId().toString();
+        try{
+            return petService.createPet(petDTO).getId().toString();
+        }
+        catch (IOException e){
+            return "not ok";
+        }
     }
 
     /**

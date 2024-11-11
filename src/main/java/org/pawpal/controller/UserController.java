@@ -2,9 +2,11 @@ package org.pawpal.controller;
 
 import org.pawpal.dto.RegisterDTO;
 import org.pawpal.dto.ResetPasswordDTO;
+import org.pawpal.dto.UserDTO;
 import org.pawpal.model.User;
 import org.pawpal.service.PasswordService;
 import org.pawpal.service.UserService;
+import org.pawpal.util.MapperUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -24,10 +26,12 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Secured("ROLE_ADMIN")
+    //@Secured("ROLE_ADMIN")
     @GetMapping("/all")
-    public List<User> getAllUsers() {
-        return userService.findAll();
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userService.findAll();
+        List<UserDTO> response = users.stream().map(MapperUtil::toUserDTO).toList();
+        return response;
     }
 
     @Secured("ROLE_ADMIN")

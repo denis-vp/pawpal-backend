@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Objects;
@@ -42,8 +43,8 @@ public class PetService {
         } else throw new RuntimeException("Pet not found");
     }
 
-    public PetDTO createPet(PetDTO petDTO) {
-        User user = userRepository.findByEmail(petDTO.getEmail());
+    public PetDTO createPet(PetDTO petDTO) throws IOException {
+        User user = userRepository.findByEmail(petDTO.getEmail()).get();
         Pet pet = MapperUtil.toPet(petDTO, user);
         return MapperUtil.toPetDTO(petRepository.save(pet));
     }

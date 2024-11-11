@@ -1,6 +1,9 @@
 package org.pawpal.dto;
 
+import org.pawpal.model.Role;
+
 import java.util.List;
+import java.util.Set;
 
 public class UserDTO {
     private Long id;
@@ -8,20 +11,28 @@ public class UserDTO {
     private String lastName;
     private String email;
     private String password;
-    private int passwordAttempts;
     private boolean isNew;
+    private Set<Role> roles;
     private List<PetDTO> pets;
 
 
-    public UserDTO(Long id, String firstName, String lastName, String email, String password, int passwordAttempts, boolean isNew, List<PetDTO> pets) {
+    public UserDTO(Long id, String firstName, String lastName, String email, String password, boolean isNew, List<PetDTO> pets, Set<Role> roles) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.passwordAttempts = passwordAttempts;
         this.isNew = isNew;
         this.pets = pets;
+        this.roles = roles;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -64,13 +75,6 @@ public class UserDTO {
         this.password = password;
     }
 
-    public int getPasswordAttempts() {
-        return passwordAttempts;
-    }
-
-    public void setPasswordAttempts(int passwordAttempts) {
-        this.passwordAttempts = passwordAttempts;
-    }
 
     public boolean isNew() {
         return isNew;
