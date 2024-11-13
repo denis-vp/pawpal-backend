@@ -22,19 +22,10 @@ public class PetController {
     /**
      * @return the user's List of PetDTO if id is found,
      **/
-    @GetMapping("/all/email")
+    @GetMapping("/all")
     public List<PetDTO> getPetsByUserEmail() {
         return petService.getPetsByUserEmail();
     }
-
-    /**
-     * @return a list of PetDto
-     **/
-    @GetMapping("/all")
-    public List<PetDTO> getPets() {
-        return petService.getAllPets();
-    }
-
 
     /**
      * @param id the ID of the pet to retrieve

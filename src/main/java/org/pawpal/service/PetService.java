@@ -25,12 +25,6 @@ public class PetService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<PetDTO> getAllPets() {
-        return petRepository.findAll().stream()
-                .map(MapperUtil::toPetDTO)
-                .toList();
-    }
-
     public List<PetDTO> getPetsByUserEmail() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return petRepository.findAll().stream()
@@ -69,11 +63,12 @@ public class PetService {
     public void deletePet(Long id)  {
         if (petRepository.existsById(id)) {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            User user = userRepository.findByEmail(email).get();
-            if(user.getPets().contains(id)) {
+            //User user = userRepository.findByEmail(email).get();
+            Pet pet = petRepository.findById(id).get();
+            if(pet.getOwner().getEmail().equals(email))
                 petRepository.deleteById(id);
-            }
-            else throw new RuntimeException("You are not authorized to delete this pet");
+            else
+                throw new RuntimeException("You are not authorized to delete this pet");
         } else throw new RuntimeException("Pet not found");
     }
 
