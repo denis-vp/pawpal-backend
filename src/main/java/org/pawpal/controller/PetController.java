@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
@@ -19,22 +20,12 @@ public class PetController {
     private PetService petService;
 
     /**
-     * @param email the Email of the user
      * @return the user's List of PetDTO if id is found,
      **/
-    @GetMapping("/all/{email}")
-    public List<PetDTO> getPetsByUserEmail(@PathVariable String email) {
-        return petService.getPetsByUserEmail(email);
-    }
-
-    /**
-     * @return a list of PetDto
-     **/
     @GetMapping("/all")
-    public List<PetDTO> getPets() {
-        return petService.getAllPets();
+    public List<PetDTO> getPetsByUserEmail() {
+        return petService.getPetsByUserEmail();
     }
-
 
     /**
      * @param id the ID of the pet to retrieve
@@ -57,7 +48,12 @@ public class PetController {
      **/
     @PostMapping("/add")
     public String createPet(@RequestBody PetDTO petDTO) {
-        return petService.createPet(petDTO).getId().toString();
+        try{
+            return petService.createPet(petDTO).getId().toString();
+        }
+        catch (IOException e){
+            return "not ok";
+        }
     }
 
     /**

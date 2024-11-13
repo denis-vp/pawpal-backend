@@ -9,30 +9,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "firstName")
+    @Column
     String firstName;
 
-    @Column(name = "lastName")
+    @Column
     String lastName;
 
-    @Column(name = "email")
+    @Column
     String email;
 
-    @Column(name = "password")
+    @Column
     String password;
 
-    @Column(name = "isNew")
+    @Column
     boolean isNew;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -40,15 +41,27 @@ public class User implements UserDetails {
     )
     Set<Role> roles;
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Pet> pets;
+
     public User() {}
 
-    public User(String firstName, String lastName, String email, String password, boolean isNew, Set<Role> roles) {
+    public User(String firstName, String lastName, String email, String password, boolean isNew, Set<Role> roles, List<Pet> pets) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.isNew = isNew;
         this.roles = roles;
+        this.pets = pets;
+    }
+
+    public List<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
     }
 
     public Long getId() {
@@ -85,7 +98,10 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        Collection<? extends GrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
+        return authorities;
     }
 
     public String getPassword() {
