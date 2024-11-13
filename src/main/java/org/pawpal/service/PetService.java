@@ -7,6 +7,7 @@ import org.pawpal.repository.PetRepository;
 import org.pawpal.repository.UserRepository;
 import org.pawpal.util.MapperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -30,7 +31,8 @@ public class PetService {
                 .toList();
     }
 
-    public List<PetDTO> getPetsByUserEmail(String email) {
+    public List<PetDTO> getPetsByUserEmail() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return petRepository.findAll().stream()
                 .filter(p -> Objects.equals(p.getOwner().getEmail(), email))
                 .map(MapperUtil::toPetDTO)
@@ -44,7 +46,8 @@ public class PetService {
     }
 
     public PetDTO createPet(PetDTO petDTO) throws IOException {
-        User user = userRepository.findByEmail(petDTO.getEmail()).get();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).get();
         Pet pet = MapperUtil.toPet(petDTO, user);
         return MapperUtil.toPetDTO(petRepository.save(pet));
     }
@@ -56,7 +59,8 @@ public class PetService {
             existingPet.setAge(petDTO.getAge());
             existingPet.setBreed(petDTO.getBreed());
             existingPet.setWeight(petDTO.getWeight());
-            existingPet.setMedicalHistory(petDTO.getMedicalHistory());
+            existingPet.setGender(petDTO.isGender());
+            existingPet.setOwner(userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get());
             Pet updatedPet = petRepository.save(existingPet);
             return MapperUtil.toPetDTO(updatedPet);
         } else throw new RuntimeException("Pet not found");
@@ -64,7 +68,12 @@ public class PetService {
 
     public void deletePet(Long id)  {
         if (petRepository.existsById(id)) {
-            petRepository.deleteById(id);
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByEmail(email).get();
+            if(user.getPets().contains(id)) {
+                petRepository.deleteById(id);
+            }
+            else throw new RuntimeException("You are not authorized to delete this pet");
         } else throw new RuntimeException("Pet not found");
     }
 

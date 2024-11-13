@@ -10,6 +10,7 @@ import org.pawpal.util.MapperUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class UserController {
     //@Secured("ROLE_ADMIN")
     @GetMapping("/all")
     public List<UserDTO> getAllUsers() {
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
         List<User> users = userService.findAll();
         List<UserDTO> response = users.stream().map(MapperUtil::toUserDTO).toList();
         return response;

@@ -1,15 +1,18 @@
 package org.pawpal.controller;
 
+import jakarta.mail.MessagingException;
 import org.pawpal.dto.LoginDTO;
 import org.pawpal.dto.LoginResponse;
 import org.pawpal.dto.RegisterDTO;
 import org.pawpal.jwt.JwtService;
+import org.pawpal.mail.EmailSender;
 import org.pawpal.model.User;
 import org.pawpal.repository.UserRepository;
 import org.pawpal.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,8 +42,14 @@ public class AuthenticationController {
     public ResponseEntity<Object> register(@RequestBody RegisterDTO registerDTO) {
         if(userRepository.findByEmail(registerDTO.getEmail()).isPresent())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An account with this email already exists");
-        User user = authenticationService.register(registerDTO);
-        return ResponseEntity.ok("Your account was created! Check your email");
+        try{
+            User user = authenticationService.register(registerDTO);
+            return ResponseEntity.ok("Your account was created! Check your email");
+        }
+        catch (MessagingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to send email");
+        }
+
     }
 
     /*

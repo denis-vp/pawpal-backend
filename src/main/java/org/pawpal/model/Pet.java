@@ -22,7 +22,7 @@ public class Pet {
     int weight;
 
     @Column
-    String medicalHistory;
+    boolean gender;
 
     @Lob
     @Column(name = "image_data")
@@ -31,13 +31,21 @@ public class Pet {
     public Pet() {
     }
 
-    public Pet(String name, String breed, int age, int weight, String medicalHistory, byte[] imageData) {
+    public Pet(String name, String breed, int age, int weight, boolean gender, byte[] imageData) {
         this.name = name;
         this.breed = breed;
         this.age = age;
         this.weight = weight;
-        this.medicalHistory = medicalHistory;
+        this.gender = gender;
         this.imageData = imageData;
+    }
+
+    public boolean isGender() {
+        return gender;
+    }
+
+    public void setGender(boolean gender) {
+        this.gender = gender;
     }
 
     public byte[] getImageData() {
@@ -91,14 +99,6 @@ public class Pet {
 
     public void setWeight(int weight) {
         this.weight = weight;
-    }
-
-    public String getMedicalHistory() {
-        return medicalHistory;
-    }
-
-    public void setMedicalHistory(String medicalHistory) {
-        this.medicalHistory = medicalHistory;
     }
 
     public User getOwner() {

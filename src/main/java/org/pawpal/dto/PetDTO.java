@@ -6,20 +6,26 @@ public class PetDTO {
     private String breed;
     private int age;
     private int weight;
-    private String medicalHistory;
-    private String email;
+    private boolean gender;
     private String image;
 
 
-    public PetDTO(Long id, String name, String breed, int age, int weight, String medicalHistory, String email, String image) {
+    public PetDTO(Long id, String name, String breed, int age, int weight, String image, boolean gender) {
         this.id = id;
         this.name = name;
         this.breed = breed;
         this.age = age;
-        this.email = email;
         this.image = image;
         this.weight = weight;
-        this.medicalHistory = medicalHistory;
+        this.gender = gender;
+    }
+
+    public boolean isGender() {
+        return gender;
+    }
+
+    public void setGender(boolean gender) {
+        this.gender = gender;
     }
 
     public String getImage() {
@@ -62,10 +68,6 @@ public class PetDTO {
         this.age = age;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public int getWeight() {
         return weight;
     }
@@ -74,15 +76,4 @@ public class PetDTO {
         this.weight = weight;
     }
 
-    public String getMedicalHistory() {
-        return medicalHistory;
-    }
-
-    public void setMedicalHistory(String medicalHistory) {
-        this.medicalHistory = medicalHistory;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

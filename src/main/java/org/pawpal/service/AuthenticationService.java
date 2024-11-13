@@ -1,11 +1,14 @@
 package org.pawpal.service;
 
+import jakarta.mail.MessagingException;
 import org.pawpal.dto.LoginDTO;
 import org.pawpal.dto.RegisterDTO;
+import org.pawpal.mail.EmailSender;
 import org.pawpal.model.Role;
 import org.pawpal.model.User;
 import org.pawpal.repository.RoleRepository;
 import org.pawpal.repository.UserRepository;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,19 +24,21 @@ import java.util.Set;
 
 @Service
 public class AuthenticationService {
+    private final EmailSender emailSender;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public AuthenticationService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailSender emailSender) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.emailSender = emailSender;
     }
 
-    public User register(RegisterDTO registerDTO) {
+    public User register(RegisterDTO registerDTO) throws MessagingException {
         User user = new User();
         user.setFirstName(registerDTO.getFirstName());
         user.setLastName(registerDTO.getLastName());
@@ -49,6 +54,10 @@ public class AuthenticationService {
         }
         user.setRoles(Set.of(userRole));
         user.setPets(new ArrayList<>());
+        String recipient = user.getEmail();
+        String subject = user.getFirstName() + " " + user.getLastName();
+        String content = "You password is " + password;
+        emailSender.sendEmail(recipient, subject, content);
         return userRepository.save(user);
     }
 

@@ -20,12 +20,11 @@ public class PetController {
     private PetService petService;
 
     /**
-     * @param email the Email of the user
      * @return the user's List of PetDTO if id is found,
      **/
-    @GetMapping("/all/{email}")
-    public List<PetDTO> getPetsByUserEmail(@PathVariable String email) {
-        return petService.getPetsByUserEmail(email);
+    @GetMapping("/all/email")
+    public List<PetDTO> getPetsByUserEmail() {
+        return petService.getPetsByUserEmail();
     }
 
     /**
