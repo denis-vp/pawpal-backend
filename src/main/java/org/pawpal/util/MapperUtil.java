@@ -2,8 +2,10 @@ package org.pawpal.util;
 
 import org.pawpal.dto.PetDTO;
 import org.pawpal.dto.UserDTO;
+import org.pawpal.dto.VeterinaryAppointmentDTO;
 import org.pawpal.model.Pet;
 import org.pawpal.model.User;
+import org.pawpal.model.VeterinaryAppointment;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -64,5 +66,18 @@ public class MapperUtil {
         user.setPets(userPets);
         user.setNew(userDTO.isNew());
         return user;
+    }
+
+    public static VeterinaryAppointment toVeterinaryAppointment(VeterinaryAppointmentDTO veterinaryAppointmentDTO) {
+        VeterinaryAppointment veterinaryAppointment = new VeterinaryAppointment();
+        veterinaryAppointment.setId(veterinaryAppointmentDTO.getId());
+        veterinaryAppointment.setLocalDateTime(veterinaryAppointmentDTO.getLocalDateTime());
+        veterinaryAppointment.setDuration(veterinaryAppointmentDTO.getDuration());
+        veterinaryAppointment.setCost(veterinaryAppointmentDTO.getCost());
+        return veterinaryAppointment;
+    }
+
+    public static VeterinaryAppointmentDTO toVeterinaryAppointmentDTO(VeterinaryAppointment veterinaryAppointment) {
+        return new VeterinaryAppointmentDTO(veterinaryAppointment.getId(), veterinaryAppointment.getUser().getId(), veterinaryAppointment.getPet().getId(), veterinaryAppointment.getStatus(), veterinaryAppointment.getLocalDateTime(), veterinaryAppointment.getDuration(), veterinaryAppointment.getCost());
     }
 }
