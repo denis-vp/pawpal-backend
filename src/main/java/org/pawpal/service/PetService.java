@@ -1,6 +1,7 @@
 package org.pawpal.service;
 
 import org.pawpal.dto.PetDTO;
+import org.pawpal.exception.ResourceNotFoundException;
 import org.pawpal.model.Pet;
 import org.pawpal.model.User;
 import org.pawpal.repository.PetRepository;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PetService {
@@ -37,6 +39,15 @@ public class PetService {
         if (petRepository.existsById(id)) {
             return MapperUtil.toPetDTO(petRepository.getOne(id));
         } else throw new RuntimeException("Pet not found");
+    }
+
+    public Pet findById(Long id){
+        Optional<Pet> pet = petRepository.findById(id);
+        if(pet.isPresent()){
+            return pet.get();
+        } else {
+            throw new ResourceNotFoundException("Pet not found with ID: " + id);
+        }
     }
 
     public PetDTO createPet(PetDTO petDTO) throws IOException {

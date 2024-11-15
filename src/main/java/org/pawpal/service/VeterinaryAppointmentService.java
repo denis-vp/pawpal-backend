@@ -21,10 +21,10 @@ public class VeterinaryAppointmentService {
   private VeterinaryAppointmentRepository veterinaryAppointmentRepository;
 
   @Autowired
-  private UserRepository userRepository;
+  private UserService userService;
 
   @Autowired
-  private PetRepository petRepository;
+  private PetService petService;
 
   public List<VeterinaryAppointmentDTO> getAllAppointments() {
     return veterinaryAppointmentRepository.findAll().stream()
@@ -43,16 +43,20 @@ public class VeterinaryAppointmentService {
   public VeterinaryAppointmentDTO createAppointment(VeterinaryAppointmentDTO appointmentDTO) {
     VeterinaryAppointment appointment = new VeterinaryAppointment();
 
-    Optional<User> user = userRepository.findById(appointment.getId());
-    if(user.isPresent())
-      appointment.setUser(user.get());
-    else
-      throw new ResourceNotFoundException("User not found with ID: " + appointment.getId());
-    Optional<Pet> pet = petRepository.findById(appointment.getId());
-    if(pet.isPresent())
-      appointment.setPet(pet.get());
-    else
-      throw new ResourceNotFoundException("Pet not found with ID: " + appointment.getId());
+    try{
+      User user = userService.findById(appointmentDTO.getUserId());
+      appointment.setUser(user);
+    } catch (ResourceNotFoundException exception) {
+      throw exception;
+    }
+
+    try {
+      Pet pet = petService.findById(appointmentDTO.getPetId());
+      appointment.setPet(pet);
+    } catch(ResourceNotFoundException exception) {
+      throw exception;
+    }
+
     appointment.setLocalDateTime(appointmentDTO.getLocalDateTime());
     appointment.setDuration(appointmentDTO.getDuration());
     appointment.setCost(appointmentDTO.getCost());
