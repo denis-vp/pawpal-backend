@@ -1,88 +1,84 @@
 package org.pawpal.controller;
 
+import lombok.AllArgsConstructor;
 import org.pawpal.dto.PetDTO;
+import org.pawpal.exception.DeleteRecordException;
+import org.pawpal.exception.ResourceNotFoundException;
+import org.pawpal.exception.SaveRecordException;
+import org.pawpal.model.User;
 import org.pawpal.service.PetService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.pawpal.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/pets")
+@AllArgsConstructor
 public class PetController {
+    private final PetService petService;
+    private final UserService userService; //not best practice, only services can access different services
 
-    @Autowired
-    private PetService petService;
-
-    /**
-     * @return the user's List of PetDTO if id is found,
-     **/
     @GetMapping("/all")
-    public List<PetDTO> getPetsByUserEmail() {
-        return petService.getPetsByUserEmail();
+    public ResponseEntity<List<PetDTO>> getPetsByUserEmail() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(petService.getPetsByUserEmail());
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    /**
-     * @param id the ID of the pet to retrieve
-     * @return a ResponseEntity containing the PetDTO if found,
-     * or a 404 Not Found status if the pet does not exist
-     * @throws RuntimeException if the pet with the specified ID is not found in the system
-     **/
     @GetMapping("/{id}")
     public ResponseEntity<PetDTO> getPet(@PathVariable Long id) {
         try {
             PetDTO petDTO = petService.getPetById(id);
             return ResponseEntity.ok(petDTO);
-        } catch (RuntimeException e) {
+        } catch (ResourceNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    /**
-     * @return the PetDTO that was added,
-     **/
     @PostMapping("/add")
-    public String createPet(@RequestBody PetDTO petDTO) {
+    public ResponseEntity<String> createPet(@RequestBody PetDTO petDTO) {
         try{
-            return petService.createPet(petDTO).getId().toString();
-        }
-        catch (IOException e){
-            return "not ok";
+            // find a new way to pass the user, maybe through front-end. a controller should depend on its service only
+            User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            return ResponseEntity.status(HttpStatus.CREATED).body(petService.createPet(user, petDTO).getId().toString());
+        } catch (SaveRecordException exception){
+          return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        } catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    /**
-     * @param id the ID of the pet to update
-     * @return a ResponseEntity containing the PetDTO if found,
-     * or a 404 Not Found status if the pet does not exist
-     * @throws RuntimeException if the pet with the specified ID is not found in the system
-     **/
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<String> updatePet(@PathVariable Long id, @RequestBody PetDTO petDTO) {
         try {
-            PetDTO persistedPet = petService.updatePet(id, petDTO);
+            // find a new way to pass the user, maybe through front-end. a controller should depend on its service only
+            User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            PetDTO persistedPet = petService.updatePet(id, petDTO, user);
             return ResponseEntity.ok(persistedPet.getId().toString());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).eTag("Path not found").body(null);
         }
     }
 
-    /**
-     * @param id the ID of the pet to update
-     * @throws RuntimeException if the pet with the specified ID is not found in the system
-     **/
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePet(@PathVariable Long id) {
         try {
             petService.deletePet(id);
             return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).eTag("Pet not found").build();
+        } catch (DeleteRecordException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (ResourceNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

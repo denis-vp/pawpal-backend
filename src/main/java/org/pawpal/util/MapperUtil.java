@@ -7,11 +7,6 @@ import org.pawpal.model.Pet;
 import org.pawpal.model.User;
 import org.pawpal.model.VeterinaryAppointment;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.List;
 
 public class MapperUtil {
@@ -19,7 +14,7 @@ public class MapperUtil {
         List<PetDTO> petsDTO = user.getPets().stream()
                 .map(MapperUtil::toPetDTO)
                 .toList();
-        return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.isNew(), petsDTO, user.getRoles());
+        return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.isNew(), user.getRoles(), petsDTO);
     }
 
     public static PetDTO toPetDTO(Pet pet) {
@@ -27,17 +22,18 @@ public class MapperUtil {
         if (pet.getImageData() != null) {
             base64Image = Base64.getEncoder().encodeToString(pet.getImageData());
         }*/
-        return new PetDTO(pet.getId(), pet.getName(), pet.getBreed(), pet.getAge(), pet.getWeight(), "null", pet.isGender());
+        return new PetDTO(pet.getId(), pet.getName(), pet.getBreed(), pet.getDateOfBirth(), pet.getType(), pet.getWeight(), pet.isMale(), "null");
     }
 
-    public static Pet toPet(PetDTO petDTO, User user) throws IOException {
+    public static Pet toPet(PetDTO petDTO, User user) {
         Pet pet = new Pet();
         pet.setId(petDTO.getId());
         pet.setName(petDTO.getName());
         pet.setBreed(petDTO.getBreed());
-        pet.setAge(petDTO.getAge());
+        pet.setDateOfBirth(petDTO.getDateOfBirth());
+        pet.setType(petDTO.getType());
         pet.setWeight(petDTO.getWeight());
-        pet.setGender(petDTO.isGender());
+        pet.setMale(petDTO.isMale());
         pet.setOwner(user);
         pet.setImageData(null);
         /*if (petDTO.getImage() != null && !petDTO.getImage().isEmpty()) {
@@ -56,13 +52,7 @@ public class MapperUtil {
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
-        List<Pet> userPets = userDTO.getPets().stream().map(p -> {
-            try {
-                return MapperUtil.toPet(p, user);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
+        List<Pet> userPets = userDTO.getPets().stream().map(p -> MapperUtil.toPet(p, user)).toList();
         user.setPets(userPets);
         user.setNew(userDTO.isNew());
         return user;
