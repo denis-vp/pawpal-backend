@@ -1,29 +1,25 @@
 package org.pawpal.service;
 
+import lombok.AllArgsConstructor;
 import org.pawpal.dto.VeterinaryAppointmentDTO;
 import org.pawpal.exception.ResourceNotFoundException;
+import org.pawpal.exception.SaveRecordException;
 import org.pawpal.model.Pet;
 import org.pawpal.model.User;
 import org.pawpal.model.VeterinaryAppointment;
-import org.pawpal.repository.PetRepository;
-import org.pawpal.repository.UserRepository;
 import org.pawpal.repository.VeterinaryAppointmentRepository;
 import org.pawpal.util.MapperUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class VeterinaryAppointmentService {
-  @Autowired
   private VeterinaryAppointmentRepository veterinaryAppointmentRepository;
 
-  @Autowired
   private UserService userService;
-
-  @Autowired
   private PetService petService;
 
   public List<VeterinaryAppointmentDTO> getAllAppointments() {
@@ -40,28 +36,26 @@ public class VeterinaryAppointmentService {
       throw new ResourceNotFoundException("Veterinary Appointment not found with ID: " + id);
   }
 
-  public VeterinaryAppointmentDTO createAppointment(VeterinaryAppointmentDTO appointmentDTO) {
+  public VeterinaryAppointmentDTO createAppointment(VeterinaryAppointmentDTO appointmentDTO) throws ResourceNotFoundException {
     VeterinaryAppointment appointment = new VeterinaryAppointment();
 
-    try{
-      User user = userService.findById(appointmentDTO.getUserId());
-      appointment.setUser(user);
-    } catch (ResourceNotFoundException exception) {
-      throw exception;
-    }
+    User user = userService.findById(appointmentDTO.getUserId());
+    appointment.setUser(user);
 
-    try {
-      Pet pet = petService.findById(appointmentDTO.getPetId());
-      appointment.setPet(pet);
-    } catch(ResourceNotFoundException exception) {
-      throw exception;
-    }
+    Pet pet = petService.findById(appointmentDTO.getPetId());
+    appointment.setPet(pet);
 
     appointment.setLocalDateTime(appointmentDTO.getLocalDateTime());
     appointment.setDuration(appointmentDTO.getDuration());
     appointment.setCost(appointmentDTO.getCost());
 
-    appointment = veterinaryAppointmentRepository.save(appointment);
+    try{
+      appointment = veterinaryAppointmentRepository.save(appointment);
+    } catch (IllegalArgumentException exception) {
+      throw new SaveRecordException("Error creating appointment:" + exception.getMessage());
+    } catch (RuntimeException exception) {
+      throw new SaveRecordException("An unexpected error occurred while creating the appointment", exception);
+    }
 
     appointmentDTO.setId(appointment.getId());
     appointmentDTO.setStatus(appointment.getStatus());
@@ -69,15 +63,23 @@ public class VeterinaryAppointmentService {
   }
 
   public VeterinaryAppointmentDTO updateAppointment(Long id, VeterinaryAppointmentDTO appointmentDTO) {
-    if(veterinaryAppointmentRepository.existsById(id)) {
-      VeterinaryAppointment existingAppointment = veterinaryAppointmentRepository.getOne(id);
-      existingAppointment.setLocalDateTime(appointmentDTO.getLocalDateTime());
-      existingAppointment.setDuration(appointmentDTO.getDuration());
-      existingAppointment.setCost(appointmentDTO.getCost());
-      VeterinaryAppointment updatedAppointment = veterinaryAppointmentRepository.save(existingAppointment);
-      return MapperUtil.toVeterinaryAppointmentDTO(updatedAppointment);
-    } else
+    Optional<VeterinaryAppointment> optionalVeterinaryAppointment = veterinaryAppointmentRepository.findById(id);
+    if(optionalVeterinaryAppointment.isEmpty())
       throw new ResourceNotFoundException("Veterinary Appointment not found with ID: " + id);
+    else {
+      VeterinaryAppointment appointment = optionalVeterinaryAppointment.get();
+      appointment.setLocalDateTime(appointmentDTO.getLocalDateTime());
+      appointment.setDuration(appointmentDTO.getDuration());
+      appointment.setCost(appointmentDTO.getCost());
+      try {
+        VeterinaryAppointment updatedAppointment = veterinaryAppointmentRepository.save(appointment);
+        return MapperUtil.toVeterinaryAppointmentDTO(updatedAppointment);
+      } catch( IllegalArgumentException exception){
+        throw new SaveRecordException("Error updating appointment:" + exception.getMessage());
+      } catch (RuntimeException exception) {
+        throw new SaveRecordException("An unexpected error occurred while updating the appointment", exception);
+      }
+    }
   }
 
   public void deleteAppointment(Long id) {

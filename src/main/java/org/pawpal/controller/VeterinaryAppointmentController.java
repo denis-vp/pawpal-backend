@@ -1,28 +1,24 @@
 package org.pawpal.controller;
 
+import lombok.AllArgsConstructor;
 import org.pawpal.dto.VeterinaryAppointmentDTO;
 import org.pawpal.exception.ResourceNotFoundException;
+import org.pawpal.exception.SaveRecordException;
 import org.pawpal.model.VeterinaryAppointment;
 import org.pawpal.service.VeterinaryAppointmentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/veterinary-appointments")
+@AllArgsConstructor
 public class VeterinaryAppointmentController {
 
   private final VeterinaryAppointmentService appointmentService;
-
-  @Autowired
-  public VeterinaryAppointmentController(VeterinaryAppointmentService appointmentService) {
-    this.appointmentService = appointmentService;
-  }
 
   @GetMapping("/all")
   public ResponseEntity<List<VeterinaryAppointmentDTO>> getAllAppointments() {
@@ -49,7 +45,11 @@ public class VeterinaryAppointmentController {
       VeterinaryAppointmentDTO createdAppointment = appointmentService.createAppointment(appointmentDTO);
       return new ResponseEntity<>(createdAppointment, HttpStatus.CREATED);
     } catch(ResourceNotFoundException exception) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    } catch(SaveRecordException exception) {
+      return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+    }catch (Exception exception) {
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -60,6 +60,10 @@ public class VeterinaryAppointmentController {
       return new ResponseEntity<>(updatedAppointment, HttpStatus.OK);
     } catch(ResourceNotFoundException exception) {
       return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    } catch(SaveRecordException exception) {
+      return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+    } catch (Exception exception) {
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
