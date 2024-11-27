@@ -54,7 +54,6 @@ public class UserService {
         newUser.setLastName(user.getLastName());
         newUser.setEmail(user.getEmail());
         String password = PasswordService.generatePassword();
-        System.out.println("Generated password: " + password);
         newUser.setPassword(passwordEncoder.encode(password));
         newUser.setNew(true);
         Optional<Role> optionalUserRole = roleRepository.findByName("ROLE_USER");
