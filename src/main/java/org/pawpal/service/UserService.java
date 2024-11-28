@@ -37,11 +37,19 @@ public class UserService {
     }
 
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        Optional<User> user =  userRepository.findByEmail(email);
+        if(user.isPresent())
+            return user.get();
+        else
+            throw new ResourceNotFoundException("User not found with email: " + email);
     }
 
     public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent())
+            return user.get();
+        else
+            throw new ResourceNotFoundException("User not found with ID: " + id);
     }
 
     public List<UserDTO> getUsersDTO() {
