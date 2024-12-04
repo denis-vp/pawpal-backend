@@ -98,4 +98,18 @@ public class PetController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/addpetdata")
+    public ResponseEntity<Void> addHardcodedPetsForUser() {
+        try {
+            // find a new way to pass the user, maybe through front-end. a controller should depend on its service only
+            User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            petService.addHardcodedPetsForUser(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        } catch (SaveRecordException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }
