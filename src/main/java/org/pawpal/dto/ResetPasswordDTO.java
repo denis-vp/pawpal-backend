@@ -10,6 +10,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ResetPasswordDTO {
-    private String email;
     private String password;
 }
