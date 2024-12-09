@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,8 @@ public class VeterinaryAppointmentService {
     Map<String, Object> templateData = new HashMap<>();
     templateData.put("recipientName", user.getFirstName() + " " + user.getLastName());
     templateData.put("petName", pet.getName());
-    templateData.put("appointmentDateTime", appointment.getLocalDateTime());
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+    templateData.put("appointmentDateTime", appointment.getLocalDateTime().format(formatter));
     templateData.put("duration", appointment.getDuration());
     templateData.put("cost", appointment.getCost());
     templateData.put("status", appointment.getStatus());
@@ -125,7 +127,8 @@ public class VeterinaryAppointmentService {
         Map<String, Object> templateData = new HashMap<>();
         templateData.put("recipientName", appointment.getUser().getFirstName() + " " + appointment.getUser().getLastName());
         templateData.put("petName", appointment.getPet().getName());
-        templateData.put("appointmentDateTime", appointment.getLocalDateTime());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+        templateData.put("appointmentDateTime", appointment.getLocalDateTime().format(formatter));
         templateData.put("senderName", "PawPal Company");
         emailSender.sendMailForAppointmentReminder(recipient, subject, templateData);
         System.out.println("sent");
