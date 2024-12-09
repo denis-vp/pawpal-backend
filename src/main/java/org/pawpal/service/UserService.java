@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class UserService {
         newUser.setNew(true);
         Optional<Role> optionalUserRole = roleRepository.findByName("ROLE_USER");
         Role userRole;
-        if(optionalUserRole.isEmpty()) {
+        if (optionalUserRole.isEmpty()) {
             userRole = new Role();
             userRole.setName("ROLE_USER");
             roleRepository.save(userRole);
@@ -69,7 +70,7 @@ public class UserService {
         newUser.setRoles(Set.of(userRole));
         try {
             return userRepository.save(newUser);
-        } catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             throw new SaveRecordException("Error creating user:" + exception.getMessage());
         } catch (RuntimeException exception) {
             throw new SaveRecordException("An unexpected error occurred while creating the user", exception);
@@ -79,21 +80,21 @@ public class UserService {
     public User updateUser(User user) {
         try {
             return userRepository.save(user);
-        } catch(IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception) {
             throw new SaveRecordException("Error updating user:" + exception.getMessage());
-        } catch(RuntimeException exception) {
+        } catch (RuntimeException exception) {
             throw new SaveRecordException("An unexpected error occurred while updating the user", exception);
         }
     }
 
     public void deleteUser(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isEmpty())
+        if (optionalUser.isEmpty())
             throw new ResourceNotFoundException("User not found with ID: " + id);
         userRepository.delete(optionalUser.get());
     }
 
-    public PetDTO addPetForUser(String email, PetDTO petDTO) throws SaveRecordException {
+    public PetDTO addPetForUser(String email, PetDTO petDTO) throws SaveRecordException, IOException {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         return petService.createPet(user, petDTO);
     }
