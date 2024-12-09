@@ -1,17 +1,23 @@
 package org.pawpal.service;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.pawpal.dto.VeterinaryAppointmentDTO;
 import org.pawpal.exception.ResourceNotFoundException;
 import org.pawpal.exception.SaveRecordException;
+import org.pawpal.mail.EmailSender;
 import org.pawpal.model.Pet;
 import org.pawpal.model.User;
 import org.pawpal.model.VeterinaryAppointment;
 import org.pawpal.repository.VeterinaryAppointmentRepository;
 import org.pawpal.util.MapperUtil;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,6 +27,7 @@ public class VeterinaryAppointmentService {
 
   private UserService userService;
   private PetService petService;
+  private EmailSender emailSender;
 
   public List<VeterinaryAppointmentDTO> getAllAppointments() {
     return veterinaryAppointmentRepository.findAll().stream()
@@ -36,7 +43,21 @@ public class VeterinaryAppointmentService {
       throw new ResourceNotFoundException("Veterinary Appointment not found with ID: " + id);
   }
 
-  public VeterinaryAppointmentDTO createAppointment(VeterinaryAppointmentDTO appointmentDTO) throws ResourceNotFoundException {
+  public List<VeterinaryAppointment> getAppointmentsWithinADay(){
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime reminderThreshold = now.plusHours(24);
+
+    List<VeterinaryAppointment> appointmentsToRemind = veterinaryAppointmentRepository.findAll().stream()
+            .filter(appointment -> {
+              LocalDateTime appointmentDateTime = appointment.getLocalDateTime();
+              return appointmentDateTime.isAfter(reminderThreshold.minusMinutes(10)) &&
+                      appointmentDateTime.isBefore(reminderThreshold.plusMinutes(10));
+            })
+            .toList();
+    return appointmentsToRemind;
+  }
+
+  public VeterinaryAppointmentDTO createAppointment(VeterinaryAppointmentDTO appointmentDTO) throws ResourceNotFoundException, MessagingException {
     VeterinaryAppointment appointment = new VeterinaryAppointment();
 
     User user = userService.findById(appointmentDTO.getUserId());
@@ -59,6 +80,18 @@ public class VeterinaryAppointmentService {
 
     appointmentDTO.setId(appointment.getId());
     appointmentDTO.setStatus(appointment.getStatus());
+
+    String recipient = user.getEmail();
+    String subject = "Veterinary Appointment Confirmation";
+    Map<String, Object> templateData = new HashMap<>();
+    templateData.put("recipientName", user.getFirstName() + " " + user.getLastName());
+    templateData.put("petName", pet.getName());
+    templateData.put("appointmentDateTime", appointment.getLocalDateTime());
+    templateData.put("duration", appointment.getDuration());
+    templateData.put("cost", appointment.getCost());
+    templateData.put("status", appointment.getStatus());
+    templateData.put("senderName", "PawPal Company");
+    emailSender.sendMailForNewAppointment(recipient, subject, templateData);
     return appointmentDTO;
   }
 
@@ -79,6 +112,27 @@ public class VeterinaryAppointmentService {
       } catch (RuntimeException exception) {
         throw new SaveRecordException("An unexpected error occurred while updating the appointment", exception);
       }
+    }
+  }
+
+  @Scheduled(fixedRate = 600000)
+  public void sendAppointmentReminders(){
+    try{
+      List<VeterinaryAppointment> appointmentsToRemind = getAppointmentsWithinADay();
+      for(VeterinaryAppointment appointment : appointmentsToRemind){
+        String recipient = appointment.getUser().getEmail();
+        String subject = "Veterinary Appointment Reminder";
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("recipientName", appointment.getUser().getFirstName() + " " + appointment.getUser().getLastName());
+        templateData.put("petName", appointment.getPet().getName());
+        templateData.put("appointmentDateTime", appointment.getLocalDateTime());
+        templateData.put("senderName", "PawPal Company");
+        emailSender.sendMailForAppointmentReminder(recipient, subject, templateData);
+        System.out.println("sent");
+      }
+    }
+    catch(MessagingException exception){
+      System.out.println(exception.getMessage());
     }
   }
 

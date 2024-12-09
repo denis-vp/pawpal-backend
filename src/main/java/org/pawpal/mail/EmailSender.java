@@ -36,4 +36,18 @@ public class EmailSender {
         String html = templateEngine.process("new_account.html", context);
         sendHTMLEmail(to, subject, html);
     }
+
+    public void  sendMailForNewAppointment(String to, String subject, Map<String, Object> templateModel) throws MessagingException {
+        Context context = new Context();
+        context.setVariables(templateModel);
+        String html = templateEngine.process("new_appointment.html", context);
+        sendHTMLEmail(to, subject, html);
+    }
+
+    public void  sendMailForAppointmentReminder(String to, String subject, Map<String, Object> templateModel) throws MessagingException {
+        Context context = new Context();
+        context.setVariables(templateModel);
+        String html = templateEngine.process("appointment_reminder.html", context);
+        sendHTMLEmail(to, subject, html);
+    }
 }

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>24-Hour Appointment Reminder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .footer {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 th:text="'Hi ' + ${recipientName} + ','">Hi, [Recipient Name]</h2>
+    <p>This is a friendly reminder about your veterinary appointment for your pet, <strong th:text="${petName}">[Pet Name]</strong>, scheduled in 24 hours,
+        at <span th:text="${appointmentDateTime}">[Appointment Date and Time]</span></p>
+    <p>If you have any questions, or need to reschedule, please contact us at least 12 hours before your appointment time.</p>
+    <p>We look forward to seeing you and your pet!</p>
+    <p>Best regards,</p>
+    <p>
+        <em th:text="${senderName}">[Sender Name]</em>
+    </p>
+</div>
+<div class="footer">
+    <p>&copy; 2024 PawPal. All rights reserved.</p>
+</div>
+</body>
+</html>
