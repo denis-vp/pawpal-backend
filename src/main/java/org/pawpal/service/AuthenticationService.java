@@ -15,9 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -48,10 +46,14 @@ public class AuthenticationService {
 
         user.setRoles(Set.of(userRole));
         user.setPets(new ArrayList<>());
+
         String recipient = user.getEmail();
-        String subject = user.getFirstName() + " " + user.getLastName();
-        String content = "You password is " + password;
-        emailSender.sendEmail(recipient, subject, content);
+        String subject = "New Account";
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("recipientName", user.getFirstName() + " " + user.getLastName());
+        templateData.put("generatedPassword", password);
+        templateData.put("senderName", "PawPal Company");
+        emailSender.sendMailForNewAccount(recipient, subject, templateData);
         return userRepository.save(user);
     }
 

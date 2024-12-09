@@ -13,6 +13,7 @@ import org.pawpal.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,7 +76,7 @@ public class UserController {
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid password! Password must contain at least one uppercase letter, "
             + "one lowercase letter, one number, one special character");
         try {
-            User user = userService.findUserByEmail(resetPasswordDTO.getEmail());
+            User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
             user.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
             user.setNew(false);
             userService.updateUser(user);
