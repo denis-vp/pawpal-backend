@@ -45,6 +45,9 @@ public class MapperUtil {
         pet.setOwner(user);
         if (petDTO.getImage() != null) {
             String cleanedImage = petDTO.getImage().replaceAll("[\\n\\r]", "").trim();
+            if (cleanedImage.startsWith("data:image/")) {
+                cleanedImage = cleanedImage.substring(cleanedImage.indexOf(",") + 1);
+            }
             byte[] decodedImage = Base64.getDecoder().decode(cleanedImage);
             System.out.println("Decoded Image Byte Array Size: " + decodedImage.length);
             pet.setImageData(decodedImage);
