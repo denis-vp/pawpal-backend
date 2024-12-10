@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
+import java.sql.SQLOutput;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class PetController {
         }
 
         try{
-            // find a new way to pass the user, maybe through front-end. a controller should depend on its service only
+            // find a new way to pass the user, maybe through front-end. a controller should depend on its service onl
             User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(petService.createPet(user, petDTO).getId().toString());
         } catch (SaveRecordException exception){

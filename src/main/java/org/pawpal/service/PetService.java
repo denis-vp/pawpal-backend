@@ -12,7 +12,7 @@ import org.pawpal.repository.PetRepository;
 import org.pawpal.util.MapperUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -49,9 +49,8 @@ public class PetService {
         }
     }
 
-    public PetDTO createPet(User user, PetDTO petDTO) {
+    public PetDTO createPet(User user, PetDTO petDTO) throws IOException {
         Pet pet = MapperUtil.toPet(petDTO, user);
-
         try {
             return MapperUtil.toPetDTO(petRepository.save(pet));
         } catch (IllegalArgumentException exception) {
