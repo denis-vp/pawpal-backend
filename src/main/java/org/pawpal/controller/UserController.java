@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import org.pawpal.dto.RegisterDTO;
 import org.pawpal.dto.ResetPasswordDTO;
 import org.pawpal.dto.UserDTO;
+import org.pawpal.dto.UserDetails;
 import org.pawpal.exception.ResourceNotFoundException;
 import org.pawpal.exception.SaveRecordException;
 import org.pawpal.model.User;
 import org.pawpal.service.PasswordService;
 import org.pawpal.service.PetService;
 import org.pawpal.service.UserService;
+import org.pawpal.util.MapperUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -28,7 +30,7 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final PetService petService;
 
-    //@Secured("ROLE_ADMIN")
+    @Secured("ROLE_ADMIN")
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         try {
@@ -90,16 +92,17 @@ public class UserController {
         }
     }
 
-//    @Secured("ROLE_USER")
-//    @PostMapping("/pets/add")
-//    public ResponseEntity<String> addPet(@RequestBody PetDTO petDTO) {
-//        try {
-//            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-//            return ResponseEntity.status(HttpStatus.CREATED).body(userService.addPetForUser(email, petDTO).getId().toString());
-//        } catch (SaveRecordException exception) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-//        } catch (Exception exception) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//        }
-//    }
+    @Secured("ROLE_USER")
+    @GetMapping("/details")
+    public ResponseEntity<UserDetails> getDetailsUser() {
+        try {
+            User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            UserDetails userDetails = MapperUtil.toUserDetails(user);
+            return ResponseEntity.ok(userDetails);
+        } catch(ResourceNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

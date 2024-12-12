@@ -40,6 +40,13 @@ public class User implements UserDetails {
     @Column(name = "is_new")
     boolean isNew;
 
+    @Lob
+    @Column(name = "image_data")
+    private byte[] imageData;
+
+    @Column
+    String imageType;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",

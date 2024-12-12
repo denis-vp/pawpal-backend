@@ -93,7 +93,8 @@ public class VeterinaryAppointmentService {
     templateData.put("cost", appointment.getCost());
     templateData.put("status", appointment.getStatus());
     templateData.put("senderName", "PawPal Company");
-    emailSender.sendMailForNewAppointment(recipient, subject, templateData);
+    // temporary comment
+//    emailSender.sendMailForNewAppointment(recipient, subject, templateData);
     return appointmentDTO;
   }
 

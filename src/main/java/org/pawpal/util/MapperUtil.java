@@ -3,6 +3,7 @@ package org.pawpal.util;
 import jakarta.persistence.Convert;
 import org.pawpal.dto.PetDTO;
 import org.pawpal.dto.UserDTO;
+import org.pawpal.dto.UserDetails;
 import org.pawpal.dto.VeterinaryAppointmentDTO;
 import org.pawpal.model.Pet;
 import org.pawpal.model.User;
@@ -22,7 +23,11 @@ public class MapperUtil {
         List<PetDTO> petsDTO = user.getPets().stream()
                 .map(MapperUtil::toPetDTO)
                 .toList();
-        return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.isNew(), user.getRoles(), petsDTO);
+        String base64Image = "";
+        if (user.getImageData() != null) {
+            base64Image = Base64.getEncoder().encodeToString(user.getImageData());
+        }
+        return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.isNew(),user.getRoles(), petsDTO, base64Image, user.getImageType());
     }
 
     public static PetDTO toPetDTO(Pet pet) {
@@ -73,7 +78,24 @@ public class MapperUtil {
         }).toList();
         user.setPets(userPets);
         user.setNew(userDTO.isNew());
+        if (userDTO.getImage() != null) {
+            String cleanedImage = userDTO.getImage().replaceAll("[\\n\\r]", "").trim();
+            if (cleanedImage.startsWith("data:image/")) {
+                cleanedImage = cleanedImage.substring(cleanedImage.indexOf(",") + 1);
+            }
+            byte[] decodedImage = Base64.getDecoder().decode(cleanedImage);
+            user.setImageData(decodedImage);
+        }
+
         return user;
+    }
+
+    public static UserDetails toUserDetails(User user) {
+        String base64Image = "";
+        if (user.getImageData() != null) {
+            base64Image = Base64.getEncoder().encodeToString(user.getImageData());
+        }
+        return new UserDetails(user.getFirstName(), user.getLastName(), user.getEmail(), user.isNew(), base64Image, user.getImageType());
     }
 
     public static VeterinaryAppointment toVeterinaryAppointment(VeterinaryAppointmentDTO veterinaryAppointmentDTO) {
