@@ -30,7 +30,7 @@ public class MapperUtil {
         if (pet.getImageData() != null) {
             base64Image = Base64.getEncoder().encodeToString(pet.getImageData());
         }
-        return new PetDTO(pet.getId(), pet.getName(), pet.getBreed(), pet.getDateOfBirth(), pet.getType(), pet.getWeight(), pet.isMale(), base64Image);
+        return new PetDTO(pet.getId(), pet.getName(), pet.getBreed(), pet.getDateOfBirth(), pet.getType(), pet.getWeight(), pet.isMale(), base64Image, pet.getImageType());
     }
 
     public static Pet toPet(PetDTO petDTO, User user) throws IOException {
@@ -43,6 +43,7 @@ public class MapperUtil {
         pet.setWeight(petDTO.getWeight());
         pet.setMale(petDTO.isMale());
         pet.setOwner(user);
+        pet.setImageType(petDTO.getImageType());
         if (petDTO.getImage() != null) {
             String cleanedImage = petDTO.getImage().replaceAll("[\\n\\r]", "").trim();
             if (cleanedImage.startsWith("data:image/")) {

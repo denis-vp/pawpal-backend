@@ -1,5 +1,6 @@
 package org.pawpal.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,8 @@ public class PetDTO {
     private LocalDate dateOfBirth;
     private AnimalType type;
     private double weight;
+    @JsonProperty("isMale")
     private boolean isMale;
     private String image;
+    private String imageType;
 }

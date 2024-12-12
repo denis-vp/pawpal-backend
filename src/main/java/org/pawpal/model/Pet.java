@@ -41,6 +41,9 @@ public class Pet {
     @Column(name = "image_data")
     private byte[] imageData;
 
+    @Column
+    String imageType;
+
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
