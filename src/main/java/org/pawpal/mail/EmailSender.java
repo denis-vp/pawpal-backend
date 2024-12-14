@@ -2,6 +2,7 @@ package org.pawpal.mail;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,11 +13,10 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class EmailSender {
-    @Autowired
-    private JavaMailSender mailSender;
 
-    @Autowired
+    private JavaMailSender mailSender;
     private SpringTemplateEngine templateEngine;
 
     public void sendHTMLEmail(String to, String subject, String body) throws MessagingException {
