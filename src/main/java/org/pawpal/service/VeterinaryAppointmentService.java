@@ -51,10 +51,11 @@ public class VeterinaryAppointmentService {
     List<VeterinaryAppointment> appointmentsToRemind = veterinaryAppointmentRepository.findAll().stream()
             .filter(appointment -> {
               LocalDateTime appointmentDateTime = appointment.getLocalDateTime();
-              return appointmentDateTime.isAfter(reminderThreshold.minusMinutes(10)) &&
-                      appointmentDateTime.isBefore(reminderThreshold.plusMinutes(10));
+              return appointmentDateTime.isAfter(reminderThreshold.minusMinutes(5)) &&
+                      appointmentDateTime.isBefore(reminderThreshold.plusMinutes(5));
             })
             .toList();
+    System.out.println("check");
     return appointmentsToRemind;
   }
 
