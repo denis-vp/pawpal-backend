@@ -12,14 +12,11 @@ import org.pawpal.model.VeterinaryAppointment;
 import org.pawpal.repository.VeterinaryAppointmentRepository;
 import org.pawpal.util.MapperUtil;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -31,7 +28,9 @@ public class VeterinaryAppointmentService {
   private EmailSender emailSender;
 
   public List<VeterinaryAppointmentDTO> getAllAppointments() {
+    String email = SecurityContextHolder.getContext().getAuthentication().getName();
     return veterinaryAppointmentRepository.findAll().stream()
+            .filter(app -> Objects.equals(app.getUser().getEmail(), email))
         .map(MapperUtil::toVeterinaryAppointmentDTO)
         .toList();
   }
@@ -62,7 +61,7 @@ public class VeterinaryAppointmentService {
   public VeterinaryAppointmentDTO createAppointment(VeterinaryAppointmentDTO appointmentDTO) throws ResourceNotFoundException, MessagingException {
     VeterinaryAppointment appointment = new VeterinaryAppointment();
 
-    User user = userService.findById(appointmentDTO.getUserId());
+    User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
     appointment.setUser(user);
 
     Pet pet = petService.findById(appointmentDTO.getPetId());
