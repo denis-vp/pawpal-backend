@@ -14,10 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -65,6 +62,11 @@ public class PetService {
         if(optionalPet.isEmpty()){
             throw new ResourceNotFoundException("Pet not found with ID: " + id);
         }
+        String cleanedImage = petDTO.getImage().replaceAll("[\\n\\r]", "").trim();
+        if (cleanedImage.startsWith("data:image/")) {
+            cleanedImage = cleanedImage.substring(cleanedImage.indexOf(",") + 1);
+        }
+        byte[] decodedImage = Base64.getDecoder().decode(cleanedImage);
         Pet pet = optionalPet.get();
         pet.setName(petDTO.getName());
         pet.setDateOfBirth(petDTO.getDateOfBirth());
@@ -72,6 +74,8 @@ public class PetService {
         pet.setWeight(petDTO.getWeight());
         pet.setMale(petDTO.isMale());
         pet.setOwner(user);
+        pet.setImageData(decodedImage);
+        pet.setImageType(petDTO.getImageType());
         Pet updatedPet = petRepository.save(pet);
         return MapperUtil.toPetDTO(updatedPet);
     }
