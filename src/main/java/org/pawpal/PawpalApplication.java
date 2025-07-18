@@ -21,7 +21,6 @@ public class PawpalApplication{
     @Secured("ROLE_USER")
     @GetMapping("/hello")
     public ResponseEntity<String> sayHello(@RequestParam(value = "myName", defaultValue = "World") String name) {
-        System.out.println("aici");
-        return ResponseEntity.ok("hellou");
+        return ResponseEntity.ok("hello");
     }
 }

@@ -32,7 +32,6 @@ public class AuthenticationService {
         user.setLastName(registerDTO.getLastName());
         user.setEmail(registerDTO.getEmail());
         String password = PasswordService.generatePassword();
-        System.out.println("Generated password: " + password);
         user.setPassword(passwordEncoder.encode(password));
         user.setNew(true);
         Optional<Role> optionalUserRole = roleRepository.findByName("ROLE_USER");

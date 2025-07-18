@@ -55,7 +55,6 @@ public class MapperUtil {
                 cleanedImage = cleanedImage.substring(cleanedImage.indexOf(",") + 1);
             }
             byte[] decodedImage = Base64.getDecoder().decode(cleanedImage);
-            System.out.println("Decoded Image Byte Array Size: " + decodedImage.length);
             pet.setImageData(decodedImage);
         }
 

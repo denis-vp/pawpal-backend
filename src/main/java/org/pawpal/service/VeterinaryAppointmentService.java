@@ -54,7 +54,6 @@ public class VeterinaryAppointmentService {
                       appointmentDateTime.isBefore(reminderThreshold.plusMinutes(5));
             })
             .toList();
-    System.out.println("check");
     return appointmentsToRemind;
   }
 
@@ -93,8 +92,7 @@ public class VeterinaryAppointmentService {
     templateData.put("cost", appointment.getCost());
     templateData.put("status", appointment.getStatus());
     templateData.put("senderName", "PawPal Company");
-    // temporary comment
-//    emailSender.sendMailForNewAppointment(recipient, subject, templateData);
+    emailSender.sendMailForNewAppointment(recipient, subject, templateData);
     return appointmentDTO;
   }
 
@@ -132,7 +130,6 @@ public class VeterinaryAppointmentService {
         templateData.put("appointmentDateTime", appointment.getLocalDateTime().format(formatter));
         templateData.put("senderName", "PawPal Company");
         emailSender.sendMailForAppointmentReminder(recipient, subject, templateData);
-        System.out.println("sent");
       }
     }
     catch(MessagingException exception){
